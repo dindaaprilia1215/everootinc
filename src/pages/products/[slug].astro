@@ -1,0 +1,14 @@
+---
+import ProductDetailView from '../../views/ProductDetailView.astro';
+import { products } from '../../data/everootData';
+
+export function getStaticPaths() {
+  return products.map((product) => ({
+    params: { slug: product.slug }
+  }));
+}
+
+const { slug } = Astro.params;
+---
+
+<ProductDetailView lang="id" slug={slug} />

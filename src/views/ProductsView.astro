@@ -1,0 +1,683 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { type Lang, getSiteData, localizePath, uiStrings } from '../i18n/ui';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'id' } = Astro.props;
+const { products } = getSiteData(lang);
+const p = uiStrings[lang].products;
+const flagship = products[0];
+---
+
+<BaseLayout
+  lang={lang}
+  title={p.pageTitle}
+  description={p.pageDesc}
+  currentPath={localizePath('/products', lang)}
+>
+  <section class="catalog-page-band">
+    <div class="container">
+      <div class="catalog-intro-block">
+        <span class="mono-meta">{p.eyebrow}</span>
+        <h1 class="display-lg catalog-title">{p.title}</h1>
+        <p class="body-xl catalog-lead">{p.lead}</p>
+
+        <div class="catalog-toolbar savee-surface-subtle">
+          <div class="toolbar-controls-grid">
+            <div class="savee-field">
+              <span class="savee-label" id="cat-drop-label-title">{p.catLabel}</span>
+              <div class="savee-dropdown" id="prod-cat-dropdown">
+                <button
+                  type="button"
+                  class="savee-dropdown-trigger toolbar-trigger"
+                  id="prod-cat-btn"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-labelledby="cat-drop-label-title prod-cat-btn"
+                >
+                  <span id="prod-cat-selected">{p.catOptions[0]}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <ul class="savee-dropdown-menu" id="prod-cat-menu" role="listbox" hidden>
+                  {p.catOptions.map((cat, idx) => (
+                    <li role="none">
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={idx === 0 ? 'true' : 'false'}
+                        class="savee-dropdown-option"
+                        data-cat-option={cat}
+                      >
+                        <span>{cat}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div class="savee-field">
+              <span class="savee-label" id="flow-drop-label-title">{p.flowLabel}</span>
+              <div class="savee-dropdown" id="prod-flow-dropdown">
+                <button
+                  type="button"
+                  class="savee-dropdown-trigger toolbar-trigger"
+                  id="prod-flow-btn"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-labelledby="flow-drop-label-title prod-flow-btn"
+                >
+                  <span id="prod-flow-selected">{p.flowOptions[0]}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <ul class="savee-dropdown-menu" id="prod-flow-menu" role="listbox" hidden>
+                  {p.flowOptions.map((flow, idx) => (
+                    <li role="none">
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={idx === 0 ? 'true' : 'false'}
+                        class="savee-dropdown-option"
+                        data-flow-option={flow}
+                      >
+                        <span>{flow}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div class="savee-field">
+              <label for="prod-search-input" class="savee-label">{p.searchLabel}</label>
+              <input
+                type="search"
+                id="prod-search-input"
+                class="savee-input toolbar-input"
+                placeholder={p.searchPlaceholder}
+              />
+            </div>
+          </div>
+
+          <div class="toolbar-footer-row">
+            <span id="prod-count-status" class="mono-meta" role="status" aria-live="polite">
+              {p.countTemplate.replace('{m}', String(products.length)).replace('{t}', String(products.length))}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div id="prod-empty-box" class="ui-state-box" role="status" aria-live="polite" hidden>
+        <h2 class="heading-sm">{p.emptyTitle}</h2>
+        <p>{p.emptyDesc}</p>
+        <button type="button" id="prod-reset-btn" class="savee-btn savee-btn-secondary-sm">
+          {p.resetBtn}
+        </button>
+      </div>
+
+      <div id="prod-catalog-content">
+        <article
+          class="flagship-spotlight savee-card-featured"
+          data-prod-card
+          data-category={flagship.category}
+          data-flow={flagship.tradeFlow}
+          data-search={`${flagship.name} ${flagship.shortName} ${flagship.regency} ${flagship.hsCode} ${flagship.summary}`.toLowerCase()}
+        >
+          <div class="flagship-media-col">
+            <img
+              src={flagship.heroImage}
+              alt={flagship.heroImageAlt}
+              width="720"
+              height="520"
+              fetchpriority="high"
+              class="flagship-img"
+            />
+          </div>
+
+          <div class="flagship-info-col">
+            <span class="mono-meta">{p.flagshipEyebrowPrefix} {flagship.hsCode}</span>
+            <h2 class="display-md flagship-title">{flagship.name}</h2>
+            <p class="body-sm flagship-origin">{flagship.originOrSource}, {flagship.regency}</p>
+            <p>{flagship.summary}</p>
+
+            <div class="flagship-specs-mini">
+              <div class="savee-surface-subtle mini-spec-box">
+                <span class="mono-meta">{p.gradeLabel}</span>
+                <strong>{flagship.grade}</strong>
+              </div>
+              <div class="savee-surface-subtle mini-spec-box">
+                <span class="mono-meta">{p.moqLabel}</span>
+                <strong>{flagship.moq}</strong>
+              </div>
+            </div>
+
+            <div class="flagship-cta-row">
+              <a href={localizePath(`/products/${flagship.slug}`, lang)} class="savee-btn savee-btn-primary">
+                {p.openSpecBtn}
+              </a>
+              <a href={localizePath(`/contact?product=${encodeURIComponent(flagship.shortName)}#rfq-form`, lang)} class="savee-btn savee-btn-secondary">
+                {p.quoteBtn}
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <div class="catalog-cards-grid">
+          {products.map((item) => (
+            <article
+              class="catalog-item-card"
+              data-prod-card
+              data-category={item.category}
+              data-flow={item.tradeFlow}
+              data-search={`${item.name} ${item.shortName} ${item.regency} ${item.hsCode} ${item.summary} ${item.partnerName}`.toLowerCase()}
+            >
+              <a href={localizePath(`/products/${item.slug}`, lang)} class="savee-media-card card-media-wrap">
+                <img
+                  src={item.heroImage}
+                  alt={item.heroImageAlt}
+                  width="520"
+                  height="380"
+                  loading="lazy"
+                  class="card-media-img"
+                />
+                <span class="savee-btn savee-btn-ghost card-flow-pill">
+                  {item.tradeFlow} • {item.category}
+                </span>
+              </a>
+
+              <div class="card-body-wrap">
+                <div class="card-hs-row">
+                  <span class="mono-meta">HS {item.hsCode}</span>
+                  <span class="body-sm">{item.regency}</span>
+                </div>
+
+                <h3 class="heading-sm">{item.name}</h3>
+                <p class="body-md card-summary">{item.summary}</p>
+
+                <div class="savee-surface-subtle card-spec-snippet">
+                  <div class="spec-line">
+                    <span class="mono-meta">{p.cardGrade}</span>
+                    <span class="body-md spec-val">{item.grade}</span>
+                  </div>
+                  <div class="spec-line">
+                    <span class="mono-meta">{p.cardMoq}</span>
+                    <span class="body-md spec-val">{item.moq}</span>
+                  </div>
+                  <div class="spec-line">
+                    <span class="mono-meta">{p.cardPartner}</span>
+                    <span class="body-md spec-val">{item.partnerName}</span>
+                  </div>
+                </div>
+
+                <a href={localizePath(`/products/${item.slug}`, lang)} class="savee-btn savee-btn-secondary-sm card-full-btn">
+                  {p.cardBtn}
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script
+  is:inline
+  define:vars={{
+    defaultCat: p.catOptions[0],
+    defaultFlow: p.flowOptions[0],
+    countTemplate: p.countTemplate
+  }}
+>
+  (function () {
+    var selectedCat = defaultCat;
+    var selectedFlow = defaultFlow;
+    var searchVal = '';
+
+    function setupDropdown(wrapId, btnId, menuId, labelId, attrName, onSelect) {
+      var wrap = document.getElementById(wrapId);
+      var btn = document.getElementById(btnId);
+      var menu = document.getElementById(menuId);
+      var label = document.getElementById(labelId);
+      if (!wrap || !btn || !menu) return;
+
+      var opts = menu.querySelectorAll('[' + attrName + ']');
+
+      btn.addEventListener('click', function () {
+        var expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        if (expanded) {
+          menu.setAttribute('hidden', '');
+        } else {
+          menu.removeAttribute('hidden');
+        }
+      });
+
+      opts.forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          var val = opt.getAttribute(attrName) || '';
+          opts.forEach(function (o) {
+            o.setAttribute('aria-selected', String(o === opt));
+          });
+          if (label) label.textContent = val;
+          btn.setAttribute('aria-expanded', 'false');
+          menu.setAttribute('hidden', '');
+          onSelect(val);
+        });
+      });
+
+      document.addEventListener('click', function (ev) {
+        if (!wrap.contains(ev.target)) {
+          btn.setAttribute('aria-expanded', 'false');
+          menu.setAttribute('hidden', '');
+        }
+      });
+
+      document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') {
+          btn.setAttribute('aria-expanded', 'false');
+          menu.setAttribute('hidden', '');
+          btn.focus();
+        }
+      });
+    }
+
+    var contentWrap = document.getElementById('prod-catalog-content');
+    var emptyBox = document.getElementById('prod-empty-box');
+    var countStatus = document.getElementById('prod-count-status');
+    var allCards = document.querySelectorAll('.catalog-cards-grid [data-prod-card]');
+    var flagshipCard = document.querySelector('.flagship-spotlight[data-prod-card]');
+    var searchInput = document.getElementById('prod-search-input');
+    var resetBtn = document.getElementById('prod-reset-btn');
+
+    function updateCatalogView() {
+      if (!contentWrap || !emptyBox) return;
+
+      var matchCount = 0;
+
+      function matchesCard(card) {
+        var cCat = card.getAttribute('data-category') || '';
+        var cFlow = card.getAttribute('data-flow') || '';
+        var cSearch = card.getAttribute('data-search') || '';
+
+        var okCat = selectedCat === defaultCat || cCat === selectedCat;
+        var okFlow = selectedFlow === defaultFlow || cFlow === selectedFlow;
+        var okSearch = !searchVal || cSearch.indexOf(searchVal) !== -1;
+        return okCat && okFlow && okSearch;
+      }
+
+      if (flagshipCard) {
+        if (matchesCard(flagshipCard)) {
+          flagshipCard.removeAttribute('hidden');
+        } else {
+          flagshipCard.setAttribute('hidden', '');
+        }
+      }
+
+      allCards.forEach(function (card) {
+        if (matchesCard(card)) {
+          card.removeAttribute('hidden');
+          matchCount++;
+        } else {
+          card.setAttribute('hidden', '');
+        }
+      });
+
+      if (countStatus) {
+        countStatus.textContent = countTemplate
+          .replace('{m}', String(matchCount))
+          .replace('{t}', String(allCards.length));
+      }
+
+      if (matchCount === 0) {
+        contentWrap.setAttribute('hidden', '');
+        emptyBox.removeAttribute('hidden');
+      } else {
+        emptyBox.setAttribute('hidden', '');
+        contentWrap.removeAttribute('hidden');
+      }
+    }
+
+    setupDropdown(
+      'prod-cat-dropdown',
+      'prod-cat-btn',
+      'prod-cat-menu',
+      'prod-cat-selected',
+      'data-cat-option',
+      function (val) {
+        selectedCat = val;
+        updateCatalogView();
+      }
+    );
+
+    setupDropdown(
+      'prod-flow-dropdown',
+      'prod-flow-btn',
+      'prod-flow-menu',
+      'prod-flow-selected',
+      'data-flow-option',
+      function (val) {
+        selectedFlow = val;
+        updateCatalogView();
+      }
+    );
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        searchVal = searchInput.value.trim().toLowerCase();
+        updateCatalogView();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        selectedCat = defaultCat;
+        selectedFlow = defaultFlow;
+        searchVal = '';
+        if (searchInput) searchInput.value = '';
+        var catLbl = document.getElementById('prod-cat-selected');
+        var flowLbl = document.getElementById('prod-flow-selected');
+        if (catLbl) catLbl.textContent = selectedCat;
+        if (flowLbl) flowLbl.textContent = selectedFlow;
+        updateCatalogView();
+      });
+    }
+  })();
+</script>
+<style>
+  .catalog-page-band {
+    padding: 48px 0 64px;
+  }
+
+  .catalog-intro-block {
+    margin-bottom: 48px;
+  }
+
+  .catalog-title {
+    margin: 12px 0 16px;
+    max-width: 20ch;
+  }
+
+  .catalog-lead {
+    max-width: 64ch;
+    margin-bottom: 28px;
+  }
+
+  .catalog-toolbar {
+    padding: 24px;
+  }
+
+  .toolbar-controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.3fr;
+    gap: 16px;
+    align-items: end;
+  }
+
+  .toolbar-controls-grid .savee-dropdown {
+    width: 100%;
+  }
+
+  .toolbar-trigger,
+  .toolbar-input {
+    background-color: var(--canvas);
+  }
+
+  .toolbar-segmented {
+    background-color: var(--surface);
+  }
+
+  .toolbar-footer-row {
+    margin-top: 20px;
+    padding-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+
+  #prod-catalog-content[hidden] {
+    display: none;
+  }
+
+  /* Flagship Featured Card */
+  .flagship-spotlight {
+    margin-bottom: 48px;
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    overflow: hidden;
+    align-items: stretch;
+  }
+
+  .flagship-spotlight[hidden] {
+    display: none;
+  }
+
+  .flagship-media-col {
+    overflow: hidden;
+  }
+
+  .flagship-img {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    object-fit: cover;
+  }
+
+  .flagship-info-col {
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .flagship-title {
+    font-size: clamp(1.6rem, 2.5vw, 2.25rem);
+    margin: 0;
+  }
+
+  .flagship-origin {
+    margin: 0;
+  }
+
+  .flagship-specs-mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 6px 0;
+  }
+
+  .mini-spec-box {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mini-spec-box strong {
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 14px;
+  }
+
+  .flagship-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  /* Catalog Cards Grid */
+  .catalog-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .catalog-item-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .catalog-item-card[hidden] {
+    display: none;
+  }
+
+  .card-media-wrap {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+  }
+
+  .card-media-img {
+    height: 100%;
+    transition: transform 0.28s ease;
+  }
+
+  .catalog-item-card:hover .card-media-img {
+    transform: scale(1.03);
+  }
+
+  .card-flow-pill {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    pointer-events: none;
+  }
+
+  .card-body-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .card-hs-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-body-wrap h3 {
+    margin: 0;
+  }
+
+  .card-summary {
+    margin: 0;
+  }
+
+  .card-spec-snippet {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: auto;
+  }
+
+  .spec-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .spec-val {
+    text-align: right;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .card-full-btn {
+    width: 100%;
+  }
+
+  @media (max-width: 1120px) {
+    .toolbar-controls-grid,
+    .flagship-spotlight {
+      grid-template-columns: 1fr;
+    }
+
+    .catalog-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .catalog-page-band {
+      padding: 20px 0 40px;
+    }
+
+    .catalog-intro-block {
+      margin-bottom: 24px;
+    }
+
+    .catalog-lead {
+      margin-bottom: 20px;
+    }
+
+    .catalog-toolbar {
+      padding: 16px;
+    }
+
+    .toolbar-controls-grid {
+      gap: 12px;
+    }
+
+    .toolbar-controls-grid > * {
+      min-width: 0;
+    }
+
+    .flagship-spotlight {
+      margin-bottom: 28px;
+      border-radius: 20px;
+    }
+
+    .flagship-img {
+      min-height: 220px;
+      height: 220px;
+    }
+
+    .flagship-info-col {
+      padding: 18px 16px;
+      gap: 12px;
+    }
+
+    .flagship-specs-mini {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .mini-spec-box {
+      padding: 10px 12px;
+    }
+
+    .flagship-cta-row {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .flagship-cta-row .savee-btn {
+      width: 100%;
+    }
+
+    .catalog-cards-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .card-media-wrap {
+      aspect-ratio: 16 / 10;
+    }
+  }
+</style>
+

@@ -1,0 +1,1121 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { type Lang, getSiteData, localizePath, uiStrings } from '../i18n/ui';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'id' } = Astro.props;
+const {
+  companyProfile,
+  careerTimeline,
+  partnerships,
+  products,
+  galleryPosts,
+  companyLocations
+} = getSiteData(lang);
+const h = uiStrings[lang].home;
+
+const flagshipProduct = products[0];
+const spiceShowcase = products.slice(1, 3);
+const craftShowcase = products.filter((p) => p.category === h.craftCategoryMatch);
+const heroGalleryStrip = products.slice(1, 5);
+const previewGallery = galleryPosts.slice(0, 4);
+---
+
+<BaseLayout
+  lang={lang}
+  title={h.pageTitle}
+  description={companyProfile.shortIntro}
+  currentPath={localizePath('/', lang)}
+>
+  <section class="hero-band">
+    <div class="container">
+      <div class="hero-header-block">
+        <h1 class="display-xl hero-headline">
+          {h.heroHeadline}
+        </h1>
+
+        <div class="hero-sub-grid">
+          <p class="body-xl hero-intro">
+            {companyProfile.shortIntro}
+          </p>
+
+          <div class="hero-cta-cluster">
+            <a href={localizePath('/products', lang)} class="savee-btn savee-btn-primary">
+              {h.exploreCatalog(products.length)}
+            </a>
+
+            <div class="savee-dropdown" id="hero-quick-dropdown">
+              <button
+                type="button"
+                class="savee-dropdown-trigger hero-drop-btn"
+                id="hero-dropdown-btn"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+              >
+                <span id="hero-dropdown-selected">{h.chooseCommodity}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <ul
+                class="savee-dropdown-menu"
+                id="hero-dropdown-menu"
+                role="listbox"
+                aria-labelledby="hero-dropdown-btn"
+                hidden
+              >
+                {products.map((prod) => (
+                  <li role="none">
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected="false"
+                      class="savee-dropdown-option"
+                      data-href={localizePath(`/products/${prod.slug}`, lang)}
+                    >
+                      <span>{prod.shortName}</span>
+                      <span class="mono-meta">{prod.tradeFlow}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-gallery-mosaic">
+        <a href={localizePath(`/products/${flagshipProduct.slug}`, lang)} class="hero-featured-card savee-card-featured">
+          <div class="hero-featured-media">
+            <img
+              src={flagshipProduct.heroImage}
+              alt={flagshipProduct.heroImageAlt}
+              width="760"
+              height="560"
+              fetchpriority="high"
+              class="hero-featured-img"
+            />
+            <span class="savee-btn savee-btn-ghost hero-media-badge">
+              HS {flagshipProduct.hsCode} • {flagshipProduct.regency}
+            </span>
+          </div>
+          <div class="hero-featured-caption">
+            <div class="caption-meta-row">
+              <span class="savee-chip">{flagshipProduct.category}</span>
+              <span class="mono-meta">{h.flagshipMoisture}</span>
+            </div>
+            <h2 class="heading-sm">{flagshipProduct.name}</h2>
+            <p class="body-md">{flagshipProduct.summary}</p>
+          </div>
+        </a>
+
+        <div class="hero-curated-grid">
+          {heroGalleryStrip.map((item) => (
+            <a href={localizePath(`/products/${item.slug}`, lang)} class="hero-tile-link">
+              <div class="savee-media-card hero-tile-media">
+                <img
+                  src={item.heroImage}
+                  alt={item.heroImageAlt}
+                  width="460"
+                  height="360"
+                  class="hero-tile-img"
+                />
+              </div>
+              <div class="hero-tile-text">
+                <span class="mono-meta">HS {item.hsCode} • {item.tradeFlow}</span>
+                <h3 class="heading-xs">{item.shortName}</h3>
+                <p class="body-sm">{item.regency}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="manifesto-band">
+    <div class="container">
+      <div class="manifesto-grid">
+        <div class="manifesto-quote-col">
+          <span class="mono-meta">{h.manifestoEyebrow}</span>
+          <p class="quote-text manifesto-quote">
+            {h.manifestoQuote}
+          </p>
+        </div>
+
+        <div class="manifesto-routes-col">
+          <div class="savee-surface-subtle route-block">
+            <span class="mono-meta">{h.route1Eyebrow}</span>
+            <h2 class="heading-sm">{h.route1Title}</h2>
+            <p class="body-md">{h.route1Body}</p>
+          </div>
+
+          <div class="savee-surface-subtle route-block">
+            <span class="mono-meta">{h.route2Eyebrow}</span>
+            <h2 class="heading-sm">{h.route2Title}</h2>
+            <p class="body-md">{h.route2Body}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="catalog-band">
+    <div class="container">
+      <div class="band-header">
+        <div>
+          <span class="mono-meta">{h.showcaseEyebrow}</span>
+          <h2 class="display-md">{h.showcaseHeading}</h2>
+        </div>
+        <a href={localizePath('/products', lang)} class="savee-btn savee-btn-secondary">
+          {h.viewAllCommodities}
+        </a>
+      </div>
+
+      <div class="catalog-columns">
+        <div class="catalog-col">
+          <div class="savee-surface col-intro-card">
+            <span class="mono-meta">{h.spiceColEyebrow}</span>
+            <h3 class="heading-sm">{h.spiceColTitle}</h3>
+            <p class="body-md">{h.spiceColDesc}</p>
+          </div>
+
+          {spiceShowcase.map((item) => (
+            <article class="catalog-item-row savee-surface-subtle">
+              <a href={localizePath(`/products/${item.slug}`, lang)} class="savee-media-card row-thumb-wrap" tabindex="-1" aria-hidden="true">
+                <img
+                  src={item.heroImage}
+                  alt=""
+                  width="360"
+                  height="280"
+                  loading="lazy"
+                  class="row-thumb-img"
+                />
+              </a>
+              <div class="row-copy-wrap">
+                <div class="row-meta-line">
+                  <span class="mono-meta">HS {item.hsCode}</span>
+                  <span class="body-sm">{item.regency}</span>
+                </div>
+                <h3 class="heading-sm">{item.shortName}</h3>
+                <p class="body-md">{item.summary}</p>
+                <div class="row-actions-line">
+                  <span class="mono-meta">MOQ: {item.moq.split('/')[0]}</span>
+                  <a href={localizePath(`/products/${item.slug}`, lang)} class="savee-btn savee-btn-secondary-sm">
+                    {h.openSpecs}
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div class="catalog-col">
+          <div class="savee-surface col-intro-card">
+            <span class="mono-meta">{h.craftColEyebrow}</span>
+            <h3 class="heading-sm">{h.craftColTitle}</h3>
+            <p class="body-md">{h.craftColDesc}</p>
+          </div>
+
+          {craftShowcase.map((item) => (
+            <article class="catalog-item-row savee-surface-subtle">
+              <a href={localizePath(`/products/${item.slug}`, lang)} class="savee-media-card row-thumb-wrap" tabindex="-1" aria-hidden="true">
+                <img
+                  src={item.heroImage}
+                  alt=""
+                  width="360"
+                  height="280"
+                  loading="lazy"
+                  class="row-thumb-img"
+                />
+              </a>
+              <div class="row-copy-wrap">
+                <div class="row-meta-line">
+                  <span class="mono-meta">HS {item.hsCode}</span>
+                  <span class="body-sm">{item.regency}</span>
+                </div>
+                <h3 class="heading-sm">{item.shortName}</h3>
+                <p class="body-md">{item.summary}</p>
+                <div class="row-actions-line">
+                  <span class="mono-meta">{item.partnerName}</span>
+                  <a href={localizePath(`/products/${item.slug}`, lang)} class="savee-btn savee-btn-secondary-sm">
+                    {h.openSpecs}
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="journey-band">
+    <div class="container">
+      <div class="journey-surface savee-surface-subtle">
+        <div class="band-header">
+          <div>
+            <span class="mono-meta">{h.journeyEyebrow}</span>
+            <h2 class="display-md">{h.journeyHeading}</h2>
+          </div>
+          <a href={localizePath('/about', lang)} class="savee-btn savee-btn-secondary-sm">
+            {h.fullHistoryBtn}
+          </a>
+        </div>
+
+        <div class="savee-segmented journey-tabs-track" role="tablist" aria-label={h.journeyTabsAria}>
+          {careerTimeline.map((item, idx) => (
+            <button
+              type="button"
+              role="tab"
+              id={`tab-year-${idx}`}
+              aria-selected={idx === 0 ? 'true' : 'false'}
+              aria-controls={`panel-year-${idx}`}
+              class={`savee-segment-btn ${idx === 0 ? 'is-active' : ''}`}
+              data-journey-tab={idx}
+            >
+              {item.year}
+            </button>
+          ))}
+        </div>
+
+        <div class="journey-panels-wrap">
+          {careerTimeline.map((item, idx) => (
+            <div
+              id={`panel-year-${idx}`}
+              role="tabpanel"
+              aria-labelledby={`tab-year-${idx}`}
+              class="journey-panel"
+              hidden={idx !== 0}
+              data-journey-panel={idx}
+            >
+              <div class="journey-panel-grid">
+                <div>
+                  <span class="mono-meta">{item.phase} • {item.location}</span>
+                  <h3 class="journey-panel-title">{item.title}</h3>
+                  <p>{item.summary}</p>
+                  <p class="body-md">{item.operationalDetail}</p>
+                </div>
+
+                <div class="journey-highlight-card savee-surface">
+                  <span class="mono-meta">{h.keyAchievementLabel}</span>
+                  <p class="heading-sm journey-achievement">{item.keyAchievement}</p>
+                  <span class="savee-chip savee-chip-dark">{item.highlightTag}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="archive-band">
+    <div class="container">
+      <div class="band-header">
+        <div>
+          <span class="mono-meta">{h.partnersEyebrow}</span>
+          <h2 class="display-md">{h.partnersHeading}</h2>
+        </div>
+        <a href={localizePath('/about#ekosistem-mitra', lang)} class="savee-btn savee-btn-secondary">
+          {h.allPartnersBtn(partnerships.length)}
+        </a>
+      </div>
+
+      <div class="partners-grid">
+        {partnerships.slice(0, 3).map((partner) => (
+          <article class="partner-card savee-surface-subtle">
+            <div class="partner-top">
+              <span class="savee-chip">{partner.category}</span>
+              <span class="mono-meta">{h.sincePrefix} {partner.sinceYear}</span>
+            </div>
+            <h3 class="heading-sm">{partner.name}</h3>
+            <p class="body-sm">{partner.regencyOrCity}</p>
+            <p class="body-md">{partner.story}</p>
+            <span class="mono-meta">{h.schemePrefix} {partner.collaborationModel}</span>
+          </article>
+        ))}
+      </div>
+
+      <div class="gallery-teaser-block">
+        <div class="band-header">
+          <div>
+            <span class="mono-meta">{h.galleryEyebrow}</span>
+            <h2 class="display-md">{h.galleryHeading}</h2>
+          </div>
+          <a href={localizePath('/gallery', lang)} class="savee-btn savee-btn-primary-sm">
+            {h.openGalleryBtn(galleryPosts.length)}
+          </a>
+        </div>
+
+        <div class="teaser-pins-grid">
+          {previewGallery.map((pin) => (
+            <a href={localizePath(`/gallery?pin=${pin.id}`, lang)} class="teaser-pin-item">
+              <div class="savee-media-card teaser-pin-media">
+                <img
+                  src={pin.image}
+                  alt={pin.imageAlt}
+                  width={pin.width}
+                  height={pin.height}
+                  loading="lazy"
+                  class="teaser-pin-img"
+                />
+                <span class="savee-btn savee-btn-ghost teaser-pin-cue">
+                  {h.readStoryCue}
+                </span>
+              </div>
+              <div class="teaser-pin-text">
+                <span class="mono-meta">{pin.location}</span>
+                <h3 class="heading-xs">{pin.title}</h3>
+                <p class="body-sm">{pin.summary}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="hub-callout savee-surface">
+        <div class="hub-callout-copy">
+          <span class="mono-meta">{h.hubEyebrow}</span>
+          <h2 class="display-md">{h.hubHeading}</h2>
+          <p>{h.hubBody}</p>
+        </div>
+        <div class="hub-callout-actions">
+          <a href={localizePath('/contact#lokasi-peta', lang)} class="savee-btn savee-btn-secondary-sm hub-map-btn">
+            {h.openMapBtn(companyLocations.length)}
+          </a>
+          <a href={localizePath('/contact#rfq-form', lang)} class="savee-btn savee-btn-primary">
+            {h.requestRfqBtn}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  (function () {
+    var dropBtn = document.getElementById('hero-dropdown-btn');
+    var dropMenu = document.getElementById('hero-dropdown-menu');
+    var dropSelected = document.getElementById('hero-dropdown-selected');
+
+    if (dropBtn && dropMenu) {
+      dropBtn.addEventListener('click', function () {
+        var expanded = dropBtn.getAttribute('aria-expanded') === 'true';
+        dropBtn.setAttribute('aria-expanded', String(!expanded));
+        if (expanded) {
+          dropMenu.setAttribute('hidden', '');
+        } else {
+          dropMenu.removeAttribute('hidden');
+        }
+      });
+
+      var options = dropMenu.querySelectorAll('.savee-dropdown-option');
+      options.forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          var targetHref = opt.getAttribute('data-href');
+          if (dropSelected) dropSelected.textContent = opt.textContent.trim();
+          dropBtn.setAttribute('aria-expanded', 'false');
+          dropMenu.setAttribute('hidden', '');
+          if (targetHref) {
+            window.location.href = targetHref;
+          }
+        });
+      });
+
+      document.addEventListener('click', function (ev) {
+        var container = document.getElementById('hero-quick-dropdown');
+        if (container && !container.contains(ev.target)) {
+          dropBtn.setAttribute('aria-expanded', 'false');
+          dropMenu.setAttribute('hidden', '');
+        }
+      });
+
+      document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && dropBtn.getAttribute('aria-expanded') === 'true') {
+          dropBtn.setAttribute('aria-expanded', 'false');
+          dropMenu.setAttribute('hidden', '');
+          dropBtn.focus();
+        }
+      });
+    }
+
+    var tabs = document.querySelectorAll('[data-journey-tab]');
+    var panels = document.querySelectorAll('[data-journey-panel]');
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var targetIdx = tab.getAttribute('data-journey-tab');
+        tabs.forEach(function (t) {
+          var active = t.getAttribute('data-journey-tab') === targetIdx;
+          t.setAttribute('aria-selected', String(active));
+          t.classList.toggle('is-active', active);
+        });
+        panels.forEach(function (p) {
+          var match = p.getAttribute('data-journey-panel') === targetIdx;
+          if (match) {
+            p.removeAttribute('hidden');
+          } else {
+            p.setAttribute('hidden', '');
+          }
+        });
+      });
+    });
+  })();
+</script>
+<style>
+  .hero-band {
+    padding: 48px 0 64px;
+  }
+
+  .hero-header-block {
+    margin-bottom: 48px;
+  }
+
+  .hero-headline {
+    max-width: 17ch;
+    margin-bottom: 28px;
+  }
+
+  .hero-sub-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 32px;
+    align-items: end;
+  }
+
+  .hero-intro {
+    max-width: 56ch;
+    margin: 0;
+  }
+
+  .hero-cta-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  .hero-drop-btn {
+    height: 56px;
+    padding: 16px 24px;
+  }
+
+  .hero-gallery-mosaic {
+    display: grid;
+    grid-template-columns: 1fr 1.25fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .hero-featured-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    overflow: hidden;
+  }
+
+  .hero-featured-media {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-featured-img {
+    width: 100%;
+    height: 410px;
+    object-fit: cover;
+  }
+
+  .hero-media-badge {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    pointer-events: none;
+  }
+
+  .hero-featured-caption {
+    padding: 24px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .caption-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-featured-caption h2 {
+    margin: 0;
+  }
+
+  .hero-featured-caption p {
+    margin: 0;
+  }
+
+  .hero-curated-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .hero-tile-link {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .hero-tile-media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .hero-tile-img {
+    height: 100%;
+    transition: transform 0.28s ease;
+  }
+
+  .hero-tile-link:hover .hero-tile-img {
+    transform: scale(1.03);
+  }
+
+  .hero-tile-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .hero-tile-text h3 {
+    margin: 2px 0;
+    color: var(--ink);
+  }
+
+  .hero-tile-text p {
+    margin: 0;
+  }
+
+  /* Band 2: Manifesto */
+  .manifesto-band {
+    padding: 48px 0;
+  }
+
+  .manifesto-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .manifesto-quote {
+    margin: 12px 0 0;
+  }
+
+  .manifesto-routes-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .route-block {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .route-block h2 {
+    margin: 0;
+  }
+
+  .route-block p {
+    margin: 0;
+  }
+
+  /* Band 3: Catalog Showcase */
+  .catalog-band,
+  .journey-band,
+  .archive-band {
+    padding: 48px 0;
+  }
+
+  .band-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .band-header h2 {
+    margin: 8px 0 0;
+  }
+
+  .catalog-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  .catalog-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .col-intro-card {
+    padding: 24px;
+  }
+
+  .col-intro-card h3 {
+    margin: 6px 0 6px;
+  }
+
+  .col-intro-card p {
+    margin: 0;
+  }
+
+  .catalog-item-row {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .row-thumb-wrap {
+    height: 180px;
+    display: block;
+  }
+
+  .row-thumb-img {
+    height: 100%;
+  }
+
+  .row-copy-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .row-meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .row-copy-wrap h3 {
+    margin: 0;
+  }
+
+  .row-copy-wrap p {
+    margin: 0;
+  }
+
+  .row-actions-line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  /* Band 4: Journey */
+  .journey-surface {
+    padding: 48px;
+    border-radius: var(--rounded-lg);
+  }
+
+  .journey-tabs-track {
+    background-color: var(--surface);
+  }
+
+  .journey-panels-wrap {
+    margin-top: 32px;
+  }
+
+  .journey-panel-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: 32px;
+    align-items: stretch;
+  }
+
+  .journey-panel-title {
+    font-size: clamp(1.35rem, 2vw, 1.75rem);
+    margin: 8px 0 12px;
+  }
+
+  .journey-highlight-card {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .journey-achievement {
+    margin: 0;
+    color: var(--ink);
+  }
+
+  /* Band 5: Partners & Gallery */
+  .partners-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 64px;
+  }
+
+  .partner-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .partner-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .partner-card h3,
+  .partner-card p {
+    margin: 0;
+  }
+
+  .gallery-teaser-block {
+    margin-bottom: 64px;
+  }
+
+  .teaser-pins-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .teaser-pin-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .teaser-pin-media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+  }
+
+  .teaser-pin-img {
+    height: 100%;
+    transition: transform 0.28s ease;
+  }
+
+  .teaser-pin-item:hover .teaser-pin-img {
+    transform: scale(1.03);
+  }
+
+  .teaser-pin-cue {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .teaser-pin-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .teaser-pin-text h3 {
+    margin: 2px 0 0;
+    color: var(--ink);
+  }
+
+  .teaser-pin-text p {
+    margin: 0;
+  }
+
+  /* Band 6: Hub Callout */
+  .hub-callout {
+    padding: 40px 48px;
+    border-radius: var(--rounded-lg);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .hub-callout-copy {
+    max-width: 64ch;
+  }
+
+  .hub-callout-copy h2 {
+    margin: 8px 0 12px;
+  }
+
+  .hub-callout-copy p {
+    margin: 0;
+  }
+
+  .hub-callout-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hub-map-btn {
+    background-color: var(--canvas);
+  }
+
+  @media (max-width: 1120px) {
+    .hero-sub-grid,
+    .hero-gallery-mosaic,
+    .manifesto-grid,
+    .catalog-columns,
+    .journey-panel-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-cta-cluster {
+      justify-content: flex-start;
+    }
+
+    .teaser-pins-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .partners-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-band {
+      padding: 20px 0 32px;
+    }
+
+    .hero-header-block {
+      margin-bottom: 24px;
+    }
+
+    .hero-headline {
+      margin-bottom: 14px;
+      max-width: 100%;
+    }
+
+    .hero-sub-grid {
+      gap: 18px;
+    }
+
+    .hero-cta-cluster {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .hero-cta-cluster .savee-btn,
+    .hero-drop-btn {
+      width: 100%;
+      height: 48px;
+      padding: 12px 18px;
+    }
+
+    .hero-gallery-mosaic {
+      gap: 16px;
+    }
+
+    .hero-featured-card {
+      border-radius: 20px;
+    }
+
+    .hero-featured-img {
+      height: 220px;
+    }
+
+    .hero-media-badge {
+      left: 10px;
+      bottom: 10px;
+      min-height: 34px;
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+
+    .hero-featured-caption {
+      padding: 16px;
+      gap: 8px;
+    }
+
+    .hero-curated-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .hero-tile-link {
+      gap: 8px;
+    }
+
+    .hero-tile-text h3 {
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .manifesto-band,
+    .catalog-band,
+    .journey-band,
+    .archive-band {
+      padding: 28px 0;
+    }
+
+    .manifesto-grid {
+      gap: 20px;
+    }
+
+    .band-header {
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .band-header .savee-btn {
+      height: 44px;
+      min-height: 44px;
+      padding: 10px 18px;
+      font-size: 14px;
+    }
+
+    .manifesto-routes-col,
+    .catalog-item-row,
+    .partners-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .route-block,
+    .col-intro-card {
+      padding: 18px 16px;
+    }
+
+    .catalog-item-row {
+      padding: 14px;
+      gap: 14px;
+    }
+
+    .row-thumb-wrap {
+      height: 170px;
+    }
+
+    .row-actions-line {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .row-actions-line .savee-btn {
+      width: 100%;
+    }
+
+    .journey-surface {
+      padding: 20px 16px;
+      border-radius: var(--rounded-xs);
+    }
+
+    .journey-tabs-track {
+      background-color: transparent;
+      border-radius: 0;
+    }
+
+    .journey-tabs-track .savee-segment-btn {
+      background-color: var(--surface);
+    }
+
+    .journey-tabs-track .savee-segment-btn.is-active {
+      background-color: var(--primary);
+      color: var(--accent-fg);
+    }
+
+    .journey-panels-wrap {
+      margin-top: 20px;
+    }
+
+    .journey-panel-grid {
+      gap: 16px;
+    }
+
+    .journey-highlight-card {
+      padding: 18px;
+    }
+
+    .partners-grid {
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+
+    .partner-card {
+      padding: 18px 16px;
+    }
+
+    .gallery-teaser-block {
+      margin-bottom: 36px;
+    }
+
+    .teaser-pins-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .teaser-pin-item {
+      gap: 8px;
+    }
+
+    .teaser-pin-cue {
+      right: 8px;
+      bottom: 8px;
+      min-height: 32px;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+
+    .teaser-pin-text h3 {
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .teaser-pin-text .body-sm {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .hub-callout {
+      padding: 22px 18px;
+      border-radius: var(--rounded-xs);
+      gap: 18px;
+    }
+
+    .hub-callout-actions {
+      width: 100%;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hub-callout-actions .savee-btn {
+      width: 100%;
+    }
+  }
+</style>
+

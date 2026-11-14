@@ -1,0 +1,1235 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { type Lang, getSiteData, localizePath, uiStrings } from '../i18n/ui';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'id' } = Astro.props;
+const { galleryPosts } = getSiteData(lang);
+const g = uiStrings[lang].gallery;
+const categories = g.categories;
+const galleryBasePath = localizePath('/gallery', lang);
+const productBasePath = localizePath('/products', lang);
+---
+
+<BaseLayout
+  lang={lang}
+  title={g.pageTitle}
+  description={g.pageDesc}
+  currentPath={galleryBasePath}
+>
+  <section class="gallery-page-band">
+    <div class="container">
+      <div class="gallery-header-wrap">
+        <div class="gallery-title-row">
+          <div class="gallery-title-copy">
+            <span class="mono-meta">{g.eyebrow}</span>
+            <h1 class="display-lg gallery-title">{g.title}</h1>
+            <p class="body-xl gallery-sub">{g.subtitle}</p>
+          </div>
+
+          <button
+            type="button"
+            id="saved-pins-toggle-btn"
+            class="savee-btn savee-btn-secondary-sm saved-counter-pill"
+            aria-pressed="false"
+            title={g.savedTitle}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 4H18V20L12 15.5L6 20V4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+            </svg>
+            <span id="saved-pins-count">0 {g.savedSuffix}</span>
+          </button>
+        </div>
+
+        <div class="gallery-filter-bar">
+          <div class="gallery-cats-scroll savee-segmented" role="group" aria-label={g.catAria}>
+            {categories.map((cat, idx) => (
+              <button
+                type="button"
+                class={`savee-segment-btn ${idx === 0 ? 'is-active' : ''}`}
+                aria-pressed={idx === 0 ? 'true' : 'false'}
+                data-gal-cat={cat}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          <div class="gallery-controls-pair">
+            <div class="search-field-wrap">
+              <label for="gallery-search-input" class="sr-only">{g.searchLabel}</label>
+              <input
+                type="search"
+                id="gallery-search-input"
+                class="savee-input gallery-search-input"
+                placeholder={g.searchPlaceholder}
+              />
+            </div>
+
+            <div class="savee-dropdown gallery-flow-dropdown" id="gal-filter-dropdown">
+              <button
+                type="button"
+                class="savee-dropdown-trigger gallery-flow-btn"
+                id="gal-drop-btn"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+              >
+                <span id="gal-drop-label">{g.flowOptions[0]}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <ul class="savee-dropdown-menu" id="gal-drop-menu" role="listbox" hidden>
+                {g.flowOptions.map((opt, idx) => (
+                  <li role="none">
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={idx === 0 ? 'true' : 'false'}
+                      class="savee-dropdown-option"
+                      data-gal-flow={opt}
+                    >
+                      <span>{opt}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="gal-empty-state" class="ui-state-box" role="status" aria-live="polite" hidden>
+        <h2 class="heading-sm">{g.emptyTitle}</h2>
+        <p id="gal-empty-desc">{g.emptyDesc}</p>
+        <button type="button" id="gal-reset-btn" class="savee-btn savee-btn-secondary-sm">
+          {g.resetBtn}
+        </button>
+      </div>
+
+      <div id="pinterest-masonry-grid" class="pinterest-masonry">
+        {galleryPosts.map((post, index) => (
+          <article
+            class={`pin-card ${post.aspectClass}`}
+            data-pin-card
+            data-pin-id={post.id}
+            data-category={post.category}
+            data-flow={post.tradeType}
+            data-search={`${post.title} ${post.location} ${post.routeLabel} ${post.summary} ${post.tags.join(' ')}`.toLowerCase()}
+          >
+            <div class="pin-media-container savee-media-card">
+              <button
+                type="button"
+                class="pin-photo-btn"
+                data-open-pin={post.id}
+                aria-label={`${g.openStoryAriaPrefix} ${post.title}`}
+              >
+                <img
+                  src={post.image}
+                  alt={post.imageAlt}
+                  width={post.width}
+                  height={post.height}
+                  fetchpriority={index === 0 ? 'high' : undefined}
+                  loading={index === 0 ? undefined : 'lazy'}
+                  class="pin-image"
+                />
+              </button>
+
+              <button
+                type="button"
+                class="pin-save-icon-btn"
+                data-save-pin={post.id}
+                aria-label={`${g.savePinAriaPrefix} ${post.title}`}
+                aria-pressed="false"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 4H18V20L12 15.5L6 20V4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="pin-caption-body">
+              <h2 class="pin-title">
+                <button type="button" class="pin-title-btn" data-open-pin={post.id}>
+                  {post.title}
+                </button>
+              </h2>
+              <div class="pin-sub-meta">
+                <span class="body-sm pin-location">{post.location}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <div
+    id="pinterest-modal-backdrop"
+    class="pin-modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-pin-title"
+    hidden
+  >
+    <div class="pin-modal-sheet">
+      <div class="pin-modal-topbar">
+        <div class="modal-nav-arrows">
+          <button
+            type="button"
+            id="modal-prev-btn"
+            class="savee-btn savee-btn-secondary-sm modal-icon-pill"
+            aria-label={g.prevAria}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span class="nav-btn-label">{g.prevBtn}</span>
+          </button>
+          <button
+            type="button"
+            id="modal-next-btn"
+            class="savee-btn savee-btn-secondary-sm modal-icon-pill"
+            aria-label={g.nextAria}
+          >
+            <span class="nav-btn-label">{g.nextBtn}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-top-actions">
+          <button
+            type="button"
+            id="modal-save-btn"
+            class="savee-btn savee-btn-secondary-sm modal-icon-pill-text"
+            aria-label={g.saveBtnAria}
+            aria-pressed="false"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 4H18V20L12 15.5L6 20V4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+            </svg>
+            <span id="modal-save-text" class="modal-action-label">{g.saveLabelSingle}</span>
+          </button>
+          <button
+            type="button"
+            id="modal-share-btn"
+            class="savee-btn savee-btn-secondary-sm modal-icon-pill-text"
+            aria-label={g.copyLinkAria}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span id="modal-share-text" class="modal-action-label">{g.copyLinkBtn}</span>
+          </button>
+          <button
+            type="button"
+            id="modal-close-btn"
+            class="savee-btn savee-btn-primary-sm modal-close-pill"
+            aria-label={g.closeAria}
+          >
+            {g.closeBtn}
+          </button>
+        </div>
+      </div>
+
+      <div class="pin-modal-body-grid">
+        <div class="pin-modal-media-col">
+          <div class="savee-media-card modal-img-frame">
+            <img
+              id="modal-pin-img"
+              src={galleryPosts[0].image}
+              alt={galleryPosts[0].imageAlt}
+              width="900"
+              height="1000"
+              class="modal-pin-img"
+            />
+          </div>
+
+          <div class="modal-passport-box savee-surface-subtle">
+            <div class="modal-passport-row">
+              <span class="mono-meta" id="modal-pin-batch">{g.batchPrefix} {galleryPosts[0].batchCode}</span>
+              <span class="mono-meta" id="modal-pin-trade">{g.tradePrefix} {galleryPosts[0].tradeType}</span>
+            </div>
+            <div class="modal-route-line" id="modal-pin-route">
+              {galleryPosts[0].routeLabel}
+            </div>
+          </div>
+        </div>
+
+        <div class="pin-modal-story-col">
+          <span class="mono-meta" id="modal-pin-cat-strip">
+            {galleryPosts[0].category.toUpperCase()} • {galleryPosts[0].location.toUpperCase()}
+          </span>
+
+          <h2 id="modal-pin-title" class="display-md modal-story-title">
+            {galleryPosts[0].title}
+          </h2>
+
+          <div class="modal-author-tile savee-surface-subtle">
+            <span class="mono-meta">{g.partnerLocLabel}</span>
+            <strong id="modal-pin-partner" class="partner-strong">
+              {galleryPosts[0].partnerUnit}
+            </strong>
+            <span id="modal-pin-date" class="body-sm">
+              {galleryPosts[0].location} • {galleryPosts[0].date}
+            </span>
+          </div>
+
+          <div class="heading-xs modal-story-heading">{g.storyHeading}</div>
+          <div id="modal-pin-paragraphs" class="modal-story-paragraphs"></div>
+
+          <div class="savee-surface-subtle modal-field-note-box">
+            <span class="mono-meta">{g.fieldNoteEyebrow}</span>
+            <p id="modal-pin-fieldnote" class="body-md"></p>
+          </div>
+
+          <div id="modal-pin-tags" class="modal-tags-wrap"></div>
+
+          <div class="modal-related-cta-box savee-surface">
+            <div>
+              <span class="mono-meta">{g.relatedEyebrow}</span>
+              <strong id="modal-related-name" class="related-prod-name">
+                {galleryPosts[0].relatedProductName}
+              </strong>
+            </div>
+            <a id="modal-related-link" href={`${productBasePath}/${galleryPosts[0].relatedProductSlug}`} class="savee-btn savee-btn-primary-sm">
+              {g.openProductSpec}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script
+  is:inline
+  define:vars={{
+    galleryPosts,
+    allCatValue: g.allCatValue,
+    allFlowValue: g.allFlowValue,
+    savedFlowValue: g.savedFlowValue,
+    savedSuffix: g.savedSuffix,
+    savedLabelSingle: g.savedLabelSingle,
+    saveLabelSingle: g.saveLabelSingle,
+    copyLinkBtn: g.copyLinkBtn,
+    copyLinkCopied: g.copyLinkCopied,
+    copyLinkAria: g.copyLinkAria,
+    copyLinkCopiedAria: g.copyLinkCopiedAria,
+    batchPrefix: g.batchPrefix,
+    tradePrefix: g.tradePrefix,
+    galleryBasePath,
+    productBasePath
+  }}
+>
+  (function () {
+    var activeCategory = allCatValue;
+    var activeFlow = allFlowValue;
+    var searchVal = '';
+    var currentPinIndex = 0;
+    var lastFocusedElement = null;
+
+    var savedIds = [];
+    try {
+      var raw = localStorage.getItem('everoot-saved-pins');
+      if (raw) savedIds = JSON.parse(raw);
+    } catch (e) {}
+
+    var savedCountEl = document.getElementById('saved-pins-count');
+    var savedToggleBtn = document.getElementById('saved-pins-toggle-btn');
+    var quickSaveBtns = document.querySelectorAll('[data-save-pin]');
+    var modalSaveBtn = document.getElementById('modal-save-btn');
+    var modalSaveText = document.getElementById('modal-save-text');
+    var modalShareBtn = document.getElementById('modal-share-btn');
+    var modalShareText = document.getElementById('modal-share-text');
+
+    function syncSavedUI() {
+      if (savedCountEl) {
+        savedCountEl.textContent = savedIds.length + ' ' + savedSuffix;
+      }
+      if (savedToggleBtn) {
+        var isFilteringSaved = activeFlow === savedFlowValue;
+        savedToggleBtn.setAttribute('aria-pressed', String(isFilteringSaved));
+        savedToggleBtn.classList.toggle('is-active-filter', isFilteringSaved);
+      }
+      quickSaveBtns.forEach(function (btn) {
+        var pid = btn.getAttribute('data-save-pin');
+        var isSaved = savedIds.indexOf(pid) !== -1;
+        btn.setAttribute('aria-pressed', String(isSaved));
+        btn.classList.toggle('is-saved', isSaved);
+      });
+      if (modalSaveBtn && galleryPosts[currentPinIndex]) {
+        var currentId = galleryPosts[currentPinIndex].id;
+        var saved = savedIds.indexOf(currentId) !== -1;
+        modalSaveBtn.setAttribute('aria-pressed', String(saved));
+        modalSaveBtn.classList.toggle('is-saved', saved);
+        if (modalSaveText) modalSaveText.textContent = saved ? savedLabelSingle : saveLabelSingle;
+      }
+    }
+
+    function toggleSavePin(pinId) {
+      var idx = savedIds.indexOf(pinId);
+      if (idx === -1) {
+        savedIds.push(pinId);
+      } else {
+        savedIds.splice(idx, 1);
+      }
+      try {
+        localStorage.setItem('everoot-saved-pins', JSON.stringify(savedIds));
+      } catch (e) {}
+      syncSavedUI();
+      if (activeFlow === savedFlowValue) {
+        applyGalleryFilters();
+      }
+    }
+
+    quickSaveBtns.forEach(function (btn) {
+      btn.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var pid = btn.getAttribute('data-save-pin');
+        if (pid) toggleSavePin(pid);
+      });
+    });
+
+    var gridEl = document.getElementById('pinterest-masonry-grid');
+    var pinCards = document.querySelectorAll('[data-pin-card]');
+    var emptyBox = document.getElementById('gal-empty-state');
+    var catBtns = document.querySelectorAll('[data-gal-cat]');
+    var dropBtn = document.getElementById('gal-drop-btn');
+    var dropMenu = document.getElementById('gal-drop-menu');
+    var dropLabel = document.getElementById('gal-drop-label');
+    var flowOpts = document.querySelectorAll('[data-gal-flow]');
+    var searchInput = document.getElementById('gallery-search-input');
+    var resetBtn = document.getElementById('gal-reset-btn');
+
+    function applyGalleryFilters() {
+      if (!gridEl || !emptyBox) return;
+
+      var visible = 0;
+      pinCards.forEach(function (card) {
+        var pid = card.getAttribute('data-pin-id') || '';
+        var cCat = card.getAttribute('data-category') || '';
+        var cFlow = card.getAttribute('data-flow') || '';
+        var cSearch = card.getAttribute('data-search') || '';
+
+        var okCat = activeCategory === allCatValue || cCat === activeCategory;
+        var okFlow = true;
+        if (activeFlow === savedFlowValue) {
+          okFlow = savedIds.indexOf(pid) !== -1;
+        } else if (activeFlow !== allFlowValue) {
+          okFlow = cFlow === activeFlow;
+        }
+        var okQuery = !searchVal || cSearch.indexOf(searchVal) !== -1;
+
+        if (okCat && okFlow && okQuery) {
+          card.removeAttribute('hidden');
+          visible++;
+        } else {
+          card.setAttribute('hidden', '');
+        }
+      });
+
+      if (visible === 0) {
+        gridEl.setAttribute('hidden', '');
+        emptyBox.removeAttribute('hidden');
+      } else {
+        emptyBox.setAttribute('hidden', '');
+        gridEl.removeAttribute('hidden');
+      }
+      syncSavedUI();
+    }
+
+    if (savedToggleBtn) {
+      savedToggleBtn.addEventListener('click', function () {
+        activeFlow = activeFlow === savedFlowValue ? allFlowValue : savedFlowValue;
+        if (dropLabel) dropLabel.textContent = activeFlow;
+        flowOpts.forEach(function (o) {
+          o.setAttribute('aria-selected', String(o.getAttribute('data-gal-flow') === activeFlow));
+        });
+        applyGalleryFilters();
+      });
+    }
+
+    catBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        activeCategory = btn.getAttribute('data-gal-cat') || allCatValue;
+        catBtns.forEach(function (b) {
+          var active = b === btn;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-pressed', String(active));
+        });
+        applyGalleryFilters();
+      });
+    });
+
+    if (dropBtn && dropMenu) {
+      dropBtn.addEventListener('click', function () {
+        var expanded = dropBtn.getAttribute('aria-expanded') === 'true';
+        dropBtn.setAttribute('aria-expanded', String(!expanded));
+        if (expanded) {
+          dropMenu.setAttribute('hidden', '');
+        } else {
+          dropMenu.removeAttribute('hidden');
+        }
+      });
+
+      flowOpts.forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          activeFlow = opt.getAttribute('data-gal-flow') || allFlowValue;
+          flowOpts.forEach(function (o) {
+            o.setAttribute('aria-selected', String(o === opt));
+          });
+          if (dropLabel) dropLabel.textContent = activeFlow;
+          dropBtn.setAttribute('aria-expanded', 'false');
+          dropMenu.setAttribute('hidden', '');
+          applyGalleryFilters();
+        });
+      });
+
+      document.addEventListener('click', function (ev) {
+        var wrap = document.getElementById('gal-filter-dropdown');
+        if (wrap && !wrap.contains(ev.target)) {
+          dropBtn.setAttribute('aria-expanded', 'false');
+          dropMenu.setAttribute('hidden', '');
+        }
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        searchVal = searchInput.value.trim().toLowerCase();
+        applyGalleryFilters();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        activeCategory = allCatValue;
+        activeFlow = allFlowValue;
+        searchVal = '';
+        if (searchInput) searchInput.value = '';
+        if (dropLabel) dropLabel.textContent = allFlowValue;
+        catBtns.forEach(function (b, idx) {
+          b.classList.toggle('is-active', idx === 0);
+          b.setAttribute('aria-pressed', String(idx === 0));
+        });
+        flowOpts.forEach(function (o, idx) {
+          o.setAttribute('aria-selected', String(idx === 0));
+        });
+        applyGalleryFilters();
+      });
+    }
+
+    var modalBackdrop = document.getElementById('pinterest-modal-backdrop');
+    var modalCloseBtn = document.getElementById('modal-close-btn');
+    var modalPrevBtn = document.getElementById('modal-prev-btn');
+    var modalNextBtn = document.getElementById('modal-next-btn');
+
+    var mImg = document.getElementById('modal-pin-img');
+    var mBatch = document.getElementById('modal-pin-batch');
+    var mTrade = document.getElementById('modal-pin-trade');
+    var mRoute = document.getElementById('modal-pin-route');
+    var mCatStrip = document.getElementById('modal-pin-cat-strip');
+    var mTitle = document.getElementById('modal-pin-title');
+    var mPartner = document.getElementById('modal-pin-partner');
+    var mDate = document.getElementById('modal-pin-date');
+    var mParagraphs = document.getElementById('modal-pin-paragraphs');
+    var mFieldnote = document.getElementById('modal-pin-fieldnote');
+    var mTags = document.getElementById('modal-pin-tags');
+    var mRelName = document.getElementById('modal-related-name');
+    var mRelLink = document.getElementById('modal-related-link');
+
+    function renderModalPin(index) {
+      if (index < 0) index = galleryPosts.length - 1;
+      if (index >= galleryPosts.length) index = 0;
+      currentPinIndex = index;
+
+      var post = galleryPosts[currentPinIndex];
+      if (!post) return;
+
+      if (mImg) {
+        mImg.setAttribute('src', post.image);
+        mImg.setAttribute('alt', post.imageAlt);
+      }
+      if (mBatch) mBatch.textContent = batchPrefix + ' ' + post.batchCode;
+      if (mTrade) mTrade.textContent = tradePrefix + ' ' + post.tradeType;
+      if (mRoute) mRoute.textContent = post.routeLabel;
+      if (mCatStrip) mCatStrip.textContent = post.category.toUpperCase() + ' • ' + post.location.toUpperCase();
+      if (mTitle) mTitle.textContent = post.title;
+      if (mPartner) mPartner.textContent = post.partnerUnit;
+      if (mDate) mDate.textContent = post.location + ' • ' + post.date;
+
+      if (mParagraphs) {
+        mParagraphs.innerHTML = '';
+        post.storyParagraphs.forEach(function (para) {
+          var pEl = document.createElement('p');
+          pEl.textContent = para;
+          mParagraphs.appendChild(pEl);
+        });
+      }
+
+      if (mFieldnote) mFieldnote.textContent = post.fieldNote;
+
+      if (mTags) {
+        mTags.innerHTML = '';
+        post.tags.forEach(function (t) {
+          var span = document.createElement('span');
+          span.className = 'modal-tag mono-meta';
+          span.textContent = '#' + t;
+          mTags.appendChild(span);
+        });
+      }
+
+      if (mRelName) mRelName.textContent = post.relatedProductName;
+      if (mRelLink) mRelLink.setAttribute('href', productBasePath + '/' + post.relatedProductSlug);
+
+      syncSavedUI();
+    }
+
+    function openPinModalById(pinId, triggerEl) {
+      var foundIdx = 0;
+      for (var i = 0; i < galleryPosts.length; i++) {
+        if (galleryPosts[i].id === pinId) {
+          foundIdx = i;
+          break;
+        }
+      }
+      lastFocusedElement = triggerEl || document.activeElement;
+      renderModalPin(foundIdx);
+      if (modalBackdrop) {
+        modalBackdrop.removeAttribute('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+      if (modalCloseBtn) modalCloseBtn.focus();
+    }
+
+    function closePinModal() {
+      if (!modalBackdrop) return;
+      modalBackdrop.setAttribute('hidden', '');
+      document.body.style.overflow = '';
+      if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        lastFocusedElement.focus();
+      }
+    }
+
+    var openBtns = document.querySelectorAll('[data-open-pin]');
+    openBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var pid = btn.getAttribute('data-open-pin');
+        if (pid) openPinModalById(pid, btn);
+      });
+    });
+
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener('click', closePinModal);
+    }
+
+    if (modalBackdrop) {
+      modalBackdrop.addEventListener('click', function (ev) {
+        if (ev.target === modalBackdrop) {
+          closePinModal();
+        }
+      });
+    }
+
+    if (modalPrevBtn) {
+      modalPrevBtn.addEventListener('click', function () {
+        renderModalPin(currentPinIndex - 1);
+      });
+    }
+
+    if (modalNextBtn) {
+      modalNextBtn.addEventListener('click', function () {
+        renderModalPin(currentPinIndex + 1);
+      });
+    }
+
+    if (modalSaveBtn) {
+      modalSaveBtn.addEventListener('click', function () {
+        var post = galleryPosts[currentPinIndex];
+        if (post) toggleSavePin(post.id);
+      });
+    }
+
+    if (modalShareBtn) {
+      modalShareBtn.addEventListener('click', function () {
+        var post = galleryPosts[currentPinIndex];
+        if (!post) return;
+        var shareUrl = window.location.origin + galleryBasePath + '?pin=' + encodeURIComponent(post.id);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareUrl).catch(function () {});
+        }
+        modalShareBtn.classList.add('is-copied');
+        modalShareBtn.setAttribute('aria-label', copyLinkCopiedAria);
+        if (modalShareText) modalShareText.textContent = copyLinkCopied;
+        setTimeout(function () {
+          modalShareBtn.classList.remove('is-copied');
+          modalShareBtn.setAttribute('aria-label', copyLinkAria);
+          if (modalShareText) modalShareText.textContent = copyLinkBtn;
+        }, 2000);
+      });
+    }
+
+    document.addEventListener('keydown', function (ev) {
+      if (!modalBackdrop || modalBackdrop.hasAttribute('hidden')) return;
+      if (ev.key === 'Escape') {
+        closePinModal();
+      } else if (ev.key === 'ArrowLeft') {
+        renderModalPin(currentPinIndex - 1);
+      } else if (ev.key === 'ArrowRight') {
+        renderModalPin(currentPinIndex + 1);
+      }
+    });
+
+    syncSavedUI();
+
+    var params = new URLSearchParams(window.location.search);
+    var initialPin = params.get('pin');
+    if (initialPin) {
+      openPinModalById(initialPin, null);
+    }
+  })();
+</script>
+<style>
+  .gallery-page-band {
+    padding: 36px 0 64px;
+  }
+
+  .gallery-header-wrap {
+    margin-bottom: 32px;
+  }
+
+  .gallery-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .gallery-title {
+    margin: 8px 0 10px;
+  }
+
+  .gallery-sub {
+    max-width: 58ch;
+    margin: 0;
+  }
+
+  .saved-counter-pill {
+    flex-shrink: 0;
+  }
+
+  .saved-counter-pill.is-active-filter {
+    background-color: var(--primary);
+    color: var(--accent-fg);
+  }
+
+  .gallery-filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .gallery-cats-scroll {
+    align-self: flex-start;
+  }
+
+  .gallery-controls-pair {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .search-field-wrap {
+    min-width: 0;
+  }
+
+  .gallery-flow-dropdown {
+    min-width: 190px;
+  }
+
+  /* Savee Edge-to-Edge Masonry Grid (Desktop) */
+  .pinterest-masonry {
+    column-count: 3;
+    column-gap: 24px;
+  }
+
+  .pinterest-masonry[hidden] {
+    display: none;
+  }
+
+  .pin-card {
+    break-inside: avoid;
+    margin-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pin-card[hidden] {
+    display: none;
+  }
+
+  .pin-media-container {
+    position: relative;
+  }
+
+  .pin-photo-btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .pin-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.28s ease;
+  }
+
+  .pin-card:hover .pin-image {
+    transform: scale(1.02);
+  }
+
+  .pin-card.ratio-tall .pin-image {
+    aspect-ratio: 3 / 4.1;
+  }
+
+  .pin-card.ratio-portrait .pin-image {
+    aspect-ratio: 4 / 4.8;
+  }
+
+  .pin-card.ratio-square .pin-image {
+    aspect-ratio: 1 / 1;
+  }
+
+  .pin-card.ratio-landscape .pin-image {
+    aspect-ratio: 16 / 11;
+  }
+
+  .pin-save-icon-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: var(--rounded-full);
+    background-color: var(--ghost-bg);
+    color: var(--ink);
+    box-shadow: var(--shadow-md), inset 0 0 0 1px rgba(10, 10, 10, 0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.16s ease, color 0.16s ease;
+  }
+
+  .pin-save-icon-btn:hover {
+    background-color: var(--canvas);
+  }
+
+  .pin-save-icon-btn.is-saved,
+  .modal-icon-pill-text.is-saved,
+  .modal-icon-pill-text.is-copied {
+    background-color: var(--primary);
+    color: var(--accent-fg);
+  }
+
+  .pin-save-icon-btn.is-saved svg path,
+  .modal-icon-pill-text.is-saved svg path {
+    fill: currentColor;
+  }
+
+  .pin-caption-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 2px;
+  }
+
+  .pin-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.2px;
+  }
+
+  .pin-title-btn {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .pin-title-btn:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pin-sub-meta {
+    display: flex;
+    align-items: center;
+  }
+
+  .pin-location {
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Savee Modal Sheet (XL Elevation) */
+  .pin-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background-color: rgba(10, 10, 10, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .pin-modal-backdrop[hidden] {
+    display: none;
+  }
+
+  .pin-modal-sheet {
+    width: 100%;
+    max-width: 1080px;
+    max-height: 90dvh;
+    overflow-y: auto;
+    border-radius: var(--rounded-lg);
+    padding: 28px;
+    background-color: var(--canvas);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .pin-modal-topbar {
+    position: sticky;
+    top: -28px;
+    z-index: 10;
+    background-color: var(--canvas);
+    padding: 12px 0 18px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .modal-nav-arrows,
+  .modal-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pin-modal-body-grid {
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: 36px;
+    align-items: start;
+  }
+
+  .modal-img-frame {
+    margin-bottom: 14px;
+  }
+
+  .modal-pin-img {
+    max-height: 540px;
+  }
+
+  .modal-passport-box {
+    padding: 18px;
+  }
+
+  .modal-passport-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .modal-route-line {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  .modal-story-title {
+    margin: 10px 0 18px;
+    font-size: clamp(1.4rem, 2.5vw, 2.25rem);
+  }
+
+  .modal-author-tile {
+    padding: 18px;
+    margin-bottom: 22px;
+  }
+
+  .partner-strong {
+    display: block;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--ink);
+    margin: 4px 0 2px;
+  }
+
+  .modal-story-heading {
+    margin-bottom: 10px;
+  }
+
+  .modal-story-paragraphs p {
+    margin-bottom: 14px;
+  }
+
+  .modal-field-note-box {
+    padding: 18px;
+    margin: 20px 0;
+  }
+
+  .modal-field-note-box p {
+    margin: 6px 0 0;
+  }
+
+  .modal-tags-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .modal-tag {
+    padding: 4px 12px;
+    border-radius: var(--rounded-full);
+    background-color: var(--surface-subtle);
+    color: var(--ink);
+  }
+
+  .modal-related-cta-box {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .related-prod-name {
+    display: block;
+    margin-top: 4px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  @media (max-width: 1024px) {
+    .pinterest-masonry {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px 16px;
+      column-count: initial;
+      align-items: start;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .pin-card {
+      min-width: 0;
+      width: 100%;
+      margin-bottom: 0;
+    }
+
+    .pin-media-container,
+    .pin-photo-btn,
+    .pin-caption-body,
+    .pin-sub-meta,
+    .pin-title,
+    .pin-title-btn {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .pin-modal-body-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .gallery-page-band {
+      padding: 16px 0 36px;
+    }
+
+    .gallery-header-wrap {
+      margin-bottom: 20px;
+    }
+
+    .gallery-title-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .gallery-title {
+      margin: 4px 0 6px;
+    }
+
+    .saved-counter-pill {
+      align-self: flex-start;
+      min-height: 44px;
+      padding: 8px 16px;
+      font-size: 13px;
+    }
+
+    .gallery-controls-pair {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .gallery-flow-dropdown {
+      width: 100%;
+      min-width: 0;
+    }
+
+    /* Clean aligned 2-column visual gallery on mobile (zero horizontal overflow) */
+    .pinterest-masonry {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px 12px;
+      column-count: initial;
+      align-items: start;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .pin-card {
+      min-width: 0;
+      width: 100%;
+      margin-bottom: 0;
+      gap: 8px;
+    }
+
+    .pin-media-container,
+    .pin-photo-btn,
+    .pin-caption-body,
+    .pin-sub-meta,
+    .pin-title,
+    .pin-title-btn {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .pin-image {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .pin-card.ratio-tall .pin-image,
+    .pin-card.ratio-portrait .pin-image,
+    .pin-card.ratio-square .pin-image,
+    .pin-card.ratio-landscape .pin-image {
+      aspect-ratio: 4 / 5;
+    }
+
+    .pin-save-icon-btn {
+      top: 8px;
+      right: 8px;
+    }
+
+    .pin-title {
+      font-size: 14px;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .pin-location {
+      font-size: 12px;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Native bottom-sheet modal on mobile */
+    .pin-modal-backdrop {
+      padding: 0;
+      align-items: flex-end;
+    }
+
+    .pin-modal-sheet {
+      width: 100%;
+      max-height: 92dvh;
+      border-radius: 24px 24px 0 0;
+      padding: 16px;
+    }
+
+    .pin-modal-topbar {
+      top: -16px;
+      padding: 8px 0 12px;
+      margin-bottom: 14px;
+      gap: 6px;
+    }
+
+    .modal-nav-arrows,
+    .modal-top-actions {
+      gap: 6px;
+    }
+
+    .nav-btn-label,
+    .modal-action-label {
+      display: none;
+    }
+
+    .modal-icon-pill,
+    .modal-icon-pill-text {
+      width: 44px;
+      min-width: 44px;
+      height: 44px;
+      padding: 0;
+    }
+
+    .modal-close-pill {
+      min-height: 44px;
+      height: 44px;
+      padding: 8px 16px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .pin-modal-body-grid {
+      gap: 20px;
+    }
+
+    .modal-pin-img {
+      max-height: 280px;
+    }
+
+    .modal-related-cta-box .savee-btn {
+      width: 100%;
+    }
+  }
+</style>
+

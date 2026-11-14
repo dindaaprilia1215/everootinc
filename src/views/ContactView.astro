@@ -1,0 +1,847 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { type Lang, getSiteData, localizePath, uiStrings } from '../i18n/ui';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'id' } = Astro.props;
+const { companyLocations, products } = getSiteData(lang);
+const c = uiStrings[lang].contact;
+const inquiryCategories = c.inquiryCategories;
+---
+
+<BaseLayout
+  lang={lang}
+  title={c.pageTitle}
+  description={c.pageDesc}
+  currentPath={localizePath('/contact', lang)}
+  includeLeaflet={true}
+>
+  <section class="contact-page-band">
+    <div class="container">
+      <div class="map-section-block" id="lokasi-peta">
+        <div class="map-header-row">
+          <span class="mono-meta">{c.mapEyebrow}</span>
+          <h1 class="display-lg contact-title">{c.mapTitle}</h1>
+          <p class="body-xl contact-lead">{c.mapLead}</p>
+        </div>
+
+        <div class="location-cards-grid" role="group" aria-label={c.selectLocAria}>
+          {companyLocations.map((loc, idx) => (
+            <button
+              type="button"
+              class={`location-select-card savee-surface-subtle ${idx === 0 ? 'is-active' : ''}`}
+              aria-pressed={idx === 0 ? 'true' : 'false'}
+              data-loc-index={idx}
+              data-lat={loc.lat}
+              data-lng={loc.lng}
+            >
+              <div class="loc-card-top">
+                <span class="savee-chip loc-chip">{loc.city}</span>
+                <span class="mono-meta loc-coords">{loc.lat}, {loc.lng}</span>
+              </div>
+              <h2 class="heading-sm loc-card-name">{loc.name}</h2>
+              <p class="body-md loc-card-role">{loc.role}</p>
+              <p class="body-sm loc-card-addr">{loc.address}</p>
+              <div class="loc-card-meta mono-meta">
+                <span>{loc.phone}</span>
+                <span>•</span>
+                <span>{loc.operationalHours}</span>
+              </div>
+              <span class="loc-focus-cue">{c.focusMapCue}</span>
+            </button>
+          ))}
+        </div>
+
+        <div class="map-frame-wrapper">
+          <div
+            id="everoot-leaflet-map"
+            class="leaflet-map-canvas"
+            role="region"
+            aria-label={c.mapRegionAria}
+          ></div>
+
+          <div class="map-active-overlay savee-card-featured" id="map-active-sheet">
+            <span class="mono-meta" id="active-loc-coords">
+              {c.coordsPrefix} {companyLocations[0].lat}, {companyLocations[0].lng}
+            </span>
+            <h3 class="heading-sm" id="active-loc-title">{companyLocations[0].name}</h3>
+            <p id="active-loc-address" class="body-md active-addr">{companyLocations[0].address}</p>
+            <ul id="active-loc-facilities" class="active-facilities-list">
+              {companyLocations[0].facilities.map((fac) => (
+                <li class="body-sm">{fac}</li>
+              ))}
+            </ul>
+            <a
+              id="active-loc-gmaps"
+              href={`https://www.google.com/maps/search/?api=1&query=${companyLocations[0].lat},${companyLocations[0].lng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="savee-btn savee-btn-primary-sm"
+            >
+              {c.openGmaps}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form-grid" id="rfq-form">
+        <div class="form-card savee-surface-subtle">
+          <span class="mono-meta">{c.rfqEyebrow}</span>
+          <h2 class="display-md form-heading">{c.rfqHeading}</h2>
+          <p class="body-md">{c.rfqLead}</p>
+
+          <form id="everoot-rfq-form" class="rfq-form" novalidate>
+            <div class="form-two-cols">
+              <div class="savee-field">
+                <label for="rfq-name" class="savee-label">{c.nameLabel}</label>
+                <input
+                  type="text"
+                  id="rfq-name"
+                  name="name"
+                  class="savee-input form-input-surface"
+                  placeholder={c.namePlaceholder}
+                  required
+                />
+              </div>
+
+              <div class="savee-field">
+                <label for="rfq-company" class="savee-label">{c.companyLabel}</label>
+                <input
+                  type="text"
+                  id="rfq-company"
+                  name="company"
+                  class="savee-input form-input-surface"
+                  placeholder={c.companyPlaceholder}
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-two-cols">
+              <div class="savee-field">
+                <label for="rfq-email" class="savee-label">{c.emailLabel}</label>
+                <input
+                  type="email"
+                  id="rfq-email"
+                  name="email"
+                  class="savee-input form-input-surface"
+                  placeholder={c.emailPlaceholder}
+                  required
+                />
+              </div>
+
+              <div class="savee-field">
+                <label for="rfq-country" class="savee-label">{c.countryLabel}</label>
+                <input
+                  type="text"
+                  id="rfq-country"
+                  name="destination"
+                  class="savee-input form-input-surface"
+                  placeholder={c.countryPlaceholder}
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="savee-field">
+              <span class="savee-label" id="inquiry-type-label">{c.inquiryLabel}</span>
+              <input type="hidden" id="rfq-type-hidden" name="inquiryType" value={inquiryCategories[0]} />
+              <div class="savee-dropdown" id="rfq-type-dropdown" style="width: 100%;">
+                <button
+                  type="button"
+                  class="savee-dropdown-trigger form-input-surface"
+                  id="rfq-type-btn"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-labelledby="inquiry-type-label rfq-type-btn"
+                >
+                  <span id="rfq-type-selected">{inquiryCategories[0]}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <ul class="savee-dropdown-menu" id="rfq-type-menu" role="listbox" hidden>
+                  {inquiryCategories.map((cat, idx) => (
+                    <li role="none">
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={idx === 0 ? 'true' : 'false'}
+                        class="savee-dropdown-option"
+                        data-inquiry-val={cat}
+                      >
+                        <span>{cat}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div class="form-two-cols">
+              <div class="savee-field">
+                <label for="rfq-commodity" class="savee-label">{c.commodityLabel}</label>
+                <select id="rfq-commodity" name="commodity" class="savee-select form-input-surface">
+                  {products.map((prod) => (
+                    <option value={prod.shortName}>
+                      {prod.shortName} (HS {prod.hsCode})
+                    </option>
+                  ))}
+                  <option value={c.mixedOption}>{c.mixedOption}</option>
+                </select>
+              </div>
+
+              <div class="savee-field">
+                <label for="rfq-volume" class="savee-label">{c.volumeLabel}</label>
+                <input
+                  type="text"
+                  id="rfq-volume"
+                  name="volume"
+                  class="savee-input form-input-surface"
+                  placeholder={c.volumePlaceholder}
+                />
+              </div>
+            </div>
+
+            <div class="savee-field">
+              <label for="rfq-message" class="savee-label">{c.messageLabel}</label>
+              <textarea
+                id="rfq-message"
+                name="message"
+                rows="4"
+                class="savee-textarea form-input-surface"
+                placeholder={c.messagePlaceholder}
+                required
+              ></textarea>
+            </div>
+
+            <div id="rfq-feedback-box" class="rfq-feedback" role="status" aria-live="polite" hidden></div>
+
+            <div class="rfq-submit-row">
+              <button type="submit" id="rfq-submit-btn" class="savee-btn savee-btn-primary">
+                {c.submitBtn}
+              </button>
+              <a href="mailto:trade@everoot-jatim.co.id" class="savee-btn savee-btn-secondary">
+                {c.directEmailBtn}
+              </a>
+            </div>
+          </form>
+        </div>
+
+        <aside class="contact-sidebar">
+          <div class="sidebar-card savee-surface">
+            <span class="mono-meta">{c.sidebarChannelsEyebrow}</span>
+            <h3 class="heading-sm">{c.sidebarChannelsTitle}</h3>
+            <div class="channel-list">
+              {c.channels.map((ch) => (
+                <div class="channel-tile">
+                  <strong>{ch.title}</strong>
+                  <p class="mono-meta">{ch.email}</p>
+                  <p class="body-sm">{ch.phone}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="sidebar-card savee-surface-subtle">
+            <span class="mono-meta">{c.sidebarDocsEyebrow}</span>
+            <h3 class="heading-sm">{c.sidebarDocsTitle}</h3>
+            <ul class="doc-checklist">
+              {c.docsList.map((doc) => (
+                <li class="body-md">{doc}</li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script
+  is:inline
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+
+<script
+  is:inline
+  define:vars={{
+    companyLocations,
+    coordsPrefix: c.coordsPrefix,
+    submitBtnText: c.submitBtn,
+    submittingBtnText: c.submittingBtn,
+    validationError: c.validationError,
+    loadingStatus: c.loadingStatus,
+    successPrefix: c.successPrefix,
+    successMiddle: c.successMiddle,
+    successSuffix: c.successSuffix
+  }}
+>
+  (function () {
+    var mapEl = document.getElementById('everoot-leaflet-map');
+    var locCards = document.querySelectorAll('[data-loc-index]');
+    var activeCoords = document.getElementById('active-loc-coords');
+    var activeTitle = document.getElementById('active-loc-title');
+    var activeAddr = document.getElementById('active-loc-address');
+    var activeFacs = document.getElementById('active-loc-facilities');
+    var activeGmaps = document.getElementById('active-loc-gmaps');
+
+    var mapInstance = null;
+    var markers = [];
+
+    function updateOverlayInfo(loc) {
+      if (!loc) return;
+      if (activeCoords) activeCoords.textContent = coordsPrefix + ' ' + loc.lat + ', ' + loc.lng;
+      if (activeTitle) activeTitle.textContent = loc.name;
+      if (activeAddr) activeAddr.textContent = loc.address;
+      if (activeFacs) {
+        activeFacs.innerHTML = '';
+        loc.facilities.forEach(function (f) {
+          var li = document.createElement('li');
+          li.className = 'body-sm';
+          li.textContent = f;
+          activeFacs.appendChild(li);
+        });
+      }
+      if (activeGmaps) {
+        activeGmaps.setAttribute(
+          'href',
+          'https://www.google.com/maps/search/?api=1&query=' + loc.lat + ',' + loc.lng
+        );
+      }
+    }
+
+    function initMap() {
+      if (!mapEl || typeof window.L === 'undefined') return;
+      var L = window.L;
+
+      mapInstance = L.map(mapEl, {
+        scrollWheelZoom: false
+      }).setView([-7.75, 113.25], 8);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(mapInstance);
+
+      companyLocations.forEach(function (loc, idx) {
+        var pinHtml =
+          '<div class="everoot-map-pin">' +
+          '<span class="pin-dot"></span>' +
+          '<span class="pin-label">' +
+          loc.name +
+          '</span>' +
+          '</div>';
+
+        var customIcon = L.divIcon({
+          className: 'everoot-custom-div-icon',
+          html: pinHtml,
+          iconSize: [240, 40],
+          iconAnchor: [20, 20]
+        });
+
+        var marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(mapInstance);
+        marker.bindPopup(
+          '<strong>' +
+            loc.name +
+            '</strong><br/><span>' +
+            loc.role +
+            '</span><br/><small>' +
+            loc.address +
+            '</small>'
+        );
+
+        marker.on('click', function () {
+          selectLocation(idx);
+        });
+
+        markers.push(marker);
+      });
+
+      if (markers[0]) {
+        markers[0].openPopup();
+      }
+    }
+
+    function selectLocation(index) {
+      var loc = companyLocations[index];
+      if (!loc) return;
+
+      locCards.forEach(function (btn) {
+        var bIdx = Number(btn.getAttribute('data-loc-index'));
+        var isMatch = bIdx === index;
+        btn.classList.toggle('is-active', isMatch);
+        btn.setAttribute('aria-pressed', String(isMatch));
+      });
+
+      updateOverlayInfo(loc);
+
+      if (mapInstance && markers[index]) {
+        mapInstance.flyTo([loc.lat, loc.lng], 12, { duration: 0.9 });
+        markers[index].openPopup();
+      }
+    }
+
+    locCards.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = Number(btn.getAttribute('data-loc-index'));
+        selectLocation(idx);
+      });
+    });
+
+    if (document.readyState === 'complete') {
+      initMap();
+    } else {
+      window.addEventListener('load', initMap);
+    }
+
+    var typeWrap = document.getElementById('rfq-type-dropdown');
+    var typeBtn = document.getElementById('rfq-type-btn');
+    var typeMenu = document.getElementById('rfq-type-menu');
+    var typeSelected = document.getElementById('rfq-type-selected');
+    var typeHidden = document.getElementById('rfq-type-hidden');
+
+    if (typeWrap && typeBtn && typeMenu) {
+      var opts = typeMenu.querySelectorAll('[data-inquiry-val]');
+
+      typeBtn.addEventListener('click', function () {
+        var expanded = typeBtn.getAttribute('aria-expanded') === 'true';
+        typeBtn.setAttribute('aria-expanded', String(!expanded));
+        if (expanded) {
+          typeMenu.setAttribute('hidden', '');
+        } else {
+          typeMenu.removeAttribute('hidden');
+        }
+      });
+
+      opts.forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          var val = opt.getAttribute('data-inquiry-val') || '';
+          opts.forEach(function (o) {
+            o.setAttribute('aria-selected', String(o === opt));
+          });
+          if (typeSelected) typeSelected.textContent = val;
+          if (typeHidden) typeHidden.value = val;
+          typeBtn.setAttribute('aria-expanded', 'false');
+          typeMenu.setAttribute('hidden', '');
+        });
+      });
+
+      document.addEventListener('click', function (ev) {
+        if (!typeWrap.contains(ev.target)) {
+          typeBtn.setAttribute('aria-expanded', 'false');
+          typeMenu.setAttribute('hidden', '');
+        }
+      });
+
+      document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && typeBtn.getAttribute('aria-expanded') === 'true') {
+          typeBtn.setAttribute('aria-expanded', 'false');
+          typeMenu.setAttribute('hidden', '');
+          typeBtn.focus();
+        }
+      });
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var prodParam = params.get('product');
+    var commoditySelect = document.getElementById('rfq-commodity');
+    if (prodParam && commoditySelect) {
+      for (var i = 0; i < commoditySelect.options.length; i++) {
+        if (commoditySelect.options[i].value.toLowerCase().indexOf(prodParam.toLowerCase()) !== -1) {
+          commoditySelect.selectedIndex = i;
+          break;
+        }
+      }
+    }
+
+    var formEl = document.getElementById('everoot-rfq-form');
+    var feedbackBox = document.getElementById('rfq-feedback-box');
+    var submitBtn = document.getElementById('rfq-submit-btn');
+
+    if (formEl && feedbackBox && submitBtn) {
+      formEl.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var nameVal = document.getElementById('rfq-name').value.trim();
+        var compVal = document.getElementById('rfq-company').value.trim();
+        var emailVal = document.getElementById('rfq-email').value.trim();
+        var destVal = document.getElementById('rfq-country').value.trim();
+        var msgVal = document.getElementById('rfq-message').value.trim();
+
+        if (!nameVal || !compVal || !emailVal || !destVal || !msgVal || emailVal.indexOf('@') === -1) {
+          feedbackBox.className = 'rfq-feedback is-error';
+          feedbackBox.textContent = validationError;
+          feedbackBox.removeAttribute('hidden');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = submittingBtnText;
+        feedbackBox.className = 'rfq-feedback is-loading';
+        feedbackBox.textContent = loadingStatus;
+        feedbackBox.removeAttribute('hidden');
+
+        setTimeout(function () {
+          submitBtn.disabled = false;
+          submitBtn.textContent = submitBtnText;
+          feedbackBox.className = 'rfq-feedback is-success';
+          feedbackBox.textContent =
+            successPrefix +
+            ' ' +
+            nameVal +
+            ' (' +
+            compVal +
+            '). ' +
+            successMiddle +
+            ' ' +
+            destVal +
+            ' ' +
+            successSuffix +
+            ' ' +
+            emailVal +
+            '.';
+          formEl.reset();
+        }, 500);
+      });
+    }
+  })();
+</script>
+<style>
+  .contact-page-band {
+    padding: 48px 0 64px;
+  }
+
+  .map-section-block {
+    margin-bottom: 64px;
+  }
+
+  .map-header-row {
+    margin-bottom: 32px;
+  }
+
+  .contact-title {
+    margin: 10px 0 14px;
+  }
+
+  .contact-lead {
+    max-width: 64ch;
+    margin: 0;
+  }
+
+  .location-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .location-select-card {
+    border: 0;
+    padding: 24px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    font-family: var(--font-savee);
+    transition: background-color 0.16s ease, color 0.16s ease;
+  }
+
+  .location-select-card:hover:not(.is-active) {
+    background-color: var(--surface);
+  }
+
+  .location-select-card.is-active {
+    background-color: var(--primary);
+    color: var(--accent-fg);
+  }
+
+  .location-select-card.is-active .loc-card-name,
+  .location-select-card.is-active .loc-card-role,
+  .location-select-card.is-active .loc-card-addr,
+  .location-select-card.is-active .loc-coords,
+  .location-select-card.is-active .loc-card-meta,
+  .location-select-card.is-active .loc-focus-cue {
+    color: var(--accent-fg);
+  }
+
+  .location-select-card.is-active .loc-chip {
+    background-color: var(--accent-fg);
+    color: var(--primary);
+  }
+
+  .loc-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .loc-card-name {
+    margin: 4px 0 0;
+  }
+
+  .loc-card-role,
+  .loc-card-addr {
+    margin: 0;
+  }
+
+  .loc-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .loc-focus-cue {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-top: 4px;
+  }
+
+  .map-frame-wrapper {
+    position: relative;
+    border-radius: var(--rounded-xs);
+    overflow: hidden;
+  }
+
+  .leaflet-map-canvas {
+    width: 100%;
+    height: 480px;
+    background-color: var(--surface);
+    z-index: 1;
+  }
+
+  .map-active-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 400;
+    max-width: 380px;
+    padding: 24px;
+    border-radius: var(--rounded-xs);
+  }
+
+  .map-active-overlay h3 {
+    margin: 6px 0 8px;
+  }
+
+  .active-addr {
+    margin-bottom: 12px;
+  }
+
+  .active-facilities-list {
+    margin: 0 0 16px;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .contact-form-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .form-card {
+    padding: 36px;
+    border-radius: var(--rounded-lg);
+  }
+
+  .form-heading {
+    margin: 10px 0 12px;
+  }
+
+  .form-input-surface {
+    background-color: var(--canvas);
+  }
+
+  .rfq-form {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .form-two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .rfq-feedback {
+    padding: 16px 20px;
+    border-radius: var(--rounded-xs);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .rfq-feedback[hidden] {
+    display: none;
+  }
+
+  .rfq-feedback.is-error {
+    background-color: var(--primary);
+    color: var(--accent-fg);
+  }
+
+  .rfq-feedback.is-loading {
+    background-color: var(--surface);
+    color: var(--ink);
+  }
+
+  .rfq-feedback.is-success {
+    background-color: var(--canvas);
+    color: var(--ink);
+    box-shadow: var(--shadow-md);
+  }
+
+  .rfq-submit-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .contact-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .sidebar-card {
+    padding: 28px;
+  }
+
+  .sidebar-card h3 {
+    margin: 6px 0 16px;
+  }
+
+  .channel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .channel-tile {
+    padding: 16px;
+    border-radius: var(--rounded-xs);
+    background-color: var(--canvas);
+  }
+
+  .channel-tile strong {
+    display: block;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .channel-tile p {
+    margin: 2px 0 0;
+  }
+
+  .doc-checklist {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  @media (max-width: 1024px) {
+    .location-cards-grid,
+    .contact-form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .map-active-overlay {
+      position: static;
+      max-width: 100%;
+      margin-top: 12px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .contact-page-band {
+      padding: 20px 0 40px;
+    }
+
+    .map-section-block {
+      margin-bottom: 36px;
+    }
+
+    .map-header-row {
+      margin-bottom: 20px;
+    }
+
+    .location-cards-grid {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 12px;
+      padding-bottom: 4px;
+      margin-bottom: 16px;
+    }
+
+    .location-cards-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .location-select-card {
+      flex: 0 0 85%;
+      scroll-snap-align: start;
+      padding: 18px 16px;
+    }
+
+    .leaflet-map-canvas {
+      height: 280px;
+    }
+
+    .map-active-overlay {
+      padding: 18px 16px;
+    }
+
+    .map-active-overlay .savee-btn {
+      width: 100%;
+    }
+
+    .contact-form-grid {
+      gap: 20px;
+    }
+
+    .form-card,
+    .sidebar-card {
+      padding: 20px 16px;
+      border-radius: var(--rounded-xs);
+    }
+
+    .form-two-cols {
+      grid-template-columns: 1fr;
+    }
+
+    .savee-dropdown {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .rfq-submit-row {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rfq-submit-row .savee-btn {
+      width: 100%;
+    }
+  }
+</style>
+
