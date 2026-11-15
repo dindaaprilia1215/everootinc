@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  lang="id"
+  title="Halaman Tidak Ditemukan (404)"
+  description="Halaman yang Anda tuju tidak tersedia di Everoot Inc."
+  currentPath="/"
+>
+  <section class="notfound-band">
+    <div class="container">
+      <div class="notfound-card savee-surface-subtle">
+        <span class="mono-meta">HTTP 404 • EVEROOT INC.</span>
+        <h1 class="display-lg">Halaman Tidak Ditemukan / Page Not Found</h1>
+        <p class="body-xl">
+          Tautan yang Anda buka mungkin telah berpindah atau tidak tersedia. Silakan kembali ke beranda bahasa Indonesia atau English.
+        </p>
+        <div class="notfound-actions">
+          <a href="/" class="savee-btn savee-btn-primary">Beranda (ID)</a>
+          <a href="/en" class="savee-btn savee-btn-secondary">Home (EN)</a>
+          <a href="/products" class="savee-btn savee-btn-secondary">Katalog Komoditas</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .notfound-band {
+    padding: 72px 0;
+  }
+
+  .notfound-card {
+    padding: 40px 32px;
+    border-radius: var(--rounded-sm);
+    max-width: 720px;
+  }
+
+  .notfound-card h1 {
+    margin: 12px 0 16px;
+  }
+
+  .notfound-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+</style>
